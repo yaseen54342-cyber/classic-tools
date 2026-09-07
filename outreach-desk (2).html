@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outreach Desk · Classic Mart</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{--navy:#111827;--blue:#2563EB;--green:#059669;--orange:#EA580C;--line:#E5E7EB;--muted:#6B7280;--bg:#F3F4F6}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:#111827;font-size:13px}
+  header{background:var(--navy);color:#fff;padding:0 20px;height:48px;display:flex;align-items:center;gap:6px}
+  header h1{margin:0 6px 0 0;font-size:15px;font-weight:700}
+  header .brand{font-size:11px;color:#9CA3AF;letter-spacing:.08em;margin-right:22px}
+  nav button{background:transparent;border:0;color:#D1D5DB;font:inherit;font-weight:600;padding:7px 12px;border-radius:6px;cursor:pointer}
+  nav button.on{background:#fff;color:var(--navy)}
+  header .saved{margin-left:auto;font-size:11px;color:#9CA3AF}
+  main{padding:16px 20px}
+  .filters{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:12px}
+  .filters label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+  input:focus,select:focus,textarea:focus{outline:2px solid #BFDBFE;border-color:var(--blue)}
+  .btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{padding:8px 12px;border-radius:6px;border:1px solid var(--line);background:#fff;font:inherit;font-weight:600;cursor:pointer;color:var(--navy);white-space:nowrap}
+  .btn.p{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.g{background:var(--green);color:#fff;border-color:var(--green)}
+  .btn.sm{padding:4px 8px;font-size:11.5px}
+  .btn input{display:none}
+  .tbl{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:auto;max-height:74vh}
+  table{width:100%;border-collapse:collapse}
+  th{position:sticky;top:0;background:#F9FAFB;color:var(--muted);text-align:left;padding:10px 8px;font-weight:600;font-size:11px;letter-spacing:.05em;border-bottom:1px solid var(--line);white-space:nowrap;z-index:1}
+  th.c,td.c{text-align:center}
+  td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tr:hover td{background:#F9FAFB}
+  .cr b{display:block;font-weight:600}
+  .cr a{color:var(--muted);text-decoration:none;font-size:11.5px}
+  .tick{width:24px;height:24px;border:1.5px solid #D1D5DB;border-radius:6px;background:#fff;cursor:pointer;display:inline-grid;place-items:center;font-size:14px;font-weight:700;color:var(--green);transition:.1s}
+  .tick:hover{border-color:var(--green)}
+  .tick.on{background:#D1FAE5;border-color:#6EE7B7}
+  .pill{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  .p0{background:#F3F4F6;color:var(--muted)} .p1{background:#DBEAFE;color:#1D4ED8} .p2{background:var(--green);color:#fff} .p3{background:#FEE2E2;color:#B91C1C}
+  .act{font-size:12px;font-weight:600;color:var(--orange)}
+  .act.n{color:var(--muted);font-weight:400}
+  .note{width:170px;font-size:12px;padding:5px 7px}
+  .menu{position:relative}
+  .menu>button{border:0;background:transparent;font-size:18px;cursor:pointer;color:var(--muted);padding:0 6px}
+  .menu div{display:none;position:absolute;right:0;top:22px;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 6px 20px rgba(0,0,0,.1);z-index:5;min-width:150px}
+  .menu.open div{display:block}
+  .menu div span{display:block;padding:8px 12px;font-size:12px;cursor:pointer}
+  .menu div span:hover{background:#F3F4F6}
+  .empty{padding:50px;text-align:center;color:var(--muted)}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:12px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .kpi b{display:block;font-size:26px;font-weight:700;line-height:1.1}
+  .kpi small{color:var(--muted)}
+  .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+  .card h3{margin:0 0 10px;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .grid label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+  textarea{min-height:80px;font-size:12.5px}
+  .funnel{display:flex;gap:6px;align-items:flex-end;height:110px}
+  .funnel div{flex:1;background:var(--navy);border-radius:4px 4px 0 0;position:relative;min-height:3px}
+  .funnel div span{position:absolute;bottom:100%;left:0;right:0;text-align:center;font-weight:700;font-size:12px;padding-bottom:2px}
+  .flab{display:flex;gap:6px;margin-top:6px}.flab div{flex:1;text-align:center;font-size:11px;color:var(--muted)}
+  .hide{display:none}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 14px;border-radius:6px;font-weight:600;opacity:0;transition:.2s;pointer-events:none}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>Outreach Desk</h1><span class="brand">CLASSIC MART</span>
+  <nav>
+    <button data-t="today">Today</button>
+    <button data-t="creators" class="on">Creators</button>
+    <button data-t="pipeline">Pipeline</button>
+    <button data-t="settings">Settings</button>
+  </nav>
+  <span class="saved" id="saved"></span>
+</header>
+
+<main>
+<section id="tab-today" class="hide">
+  <div class="kpis" id="tk"></div>
+  <div class="tbl" id="ttbl"></div>
+</section>
+
+<section id="tab-creators">
+  <div class="filters">
+    <div><label>Search</label><input type="text" id="q" placeholder="naam ya handle"></div>
+    <div><label>Status</label><select id="fs"><option value="">Sab</option><option>Not started</option><option>In Progress</option><option>Video Posted</option><option>Closed</option></select></div>
+    <div><label>Batch</label><select id="fb"><option value="">Sab</option></select></div>
+    <div><label>Sort</label><select id="so"><option value="action">Action pehle</option><option value="days">Days</option><option value="score">Score</option><option value="followers">Followers</option><option value="added">Recently added</option></select></div>
+    <div class="btns">
+      <label class="btn g">+ Excel import <input type="file" id="file" multiple accept=".xlsx,.xls,.csv"></label>
+      <button class="btn" id="addOne">+ Add</button>
+      <button class="btn p" id="bulkInv">Sab ko Inv ✓</button>
+    </div>
+  </div>
+  <div class="tbl" id="ctbl"></div>
+</section>
+
+<section id="tab-pipeline" class="hide">
+  <div class="kpis" id="pk"></div>
+  <div class="card"><div class="funnel" id="fun"></div><div class="flab"><div>Total</div><div>Invited</div><div>Messaged</div><div>Replied</div><div>Sample</div><div>Video</div></div></div>
+  <div class="card" id="bstats"></div>
+</section>
+
+<section id="tab-settings" class="hide">
+  <div class="card"><h3>Follow-up timing (days)</h3><div class="grid">
+    <div><label>Invite → message</label><input type="number" id="dInv" value="1"></div>
+    <div><label>Message → follow-up</label><input type="number" id="dMsg" value="3"></div>
+    <div><label>Reply → sample</label><input type="number" id="dRep" value="1"></div>
+    <div><label>Sample → ask video</label><input type="number" id="dSmp" value="7"></div>
+  </div></div>
+  <div class="card"><h3>Message templates <small style="color:var(--muted);font-weight:400">— row menu (⋯) se copy, {name} khud replace hota hai</small></h3>
+    <label>First message</label><textarea id="t1"></textarea>
+    <label style="margin-top:8px;display:block">Follow-up</label><textarea id="t2"></textarea>
+    <label style="margin-top:8px;display:block">After sample</label><textarea id="t3"></textarea>
+  </div>
+  <div class="card"><h3>Backup</h3><div class="btns">
+    <button class="btn p" id="bk">Backup JSON</button>
+    <label class="btn">Restore JSON <input type="file" id="rs" accept=".json"></label>
+    <button class="btn" id="xl">Excel export</button>
+    <button class="btn" id="wipe" style="margin-left:auto;color:#B91C1C">Sab delete</button>
+  </div><p style="color:var(--muted);font-size:11.5px;margin:8px 0 0">Data isi browser mein save hota hai. Dusre computer pe le jane ke liye Backup JSON lo.</p></div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='cm_outreach_v2';
+const ST=[['inv','Invited'],['msg','Messaged'],['rep','Replied'],['smp','Sample sent'],['vid','Video posted']];
+const DT={dInv:1,dMsg:3,dRep:1,dSmp:7,
+ t1:`Hi {name}! Love your content. We're Classic Mart on TikTok Shop — we have a leather car registration holder that's perfect for glovebox organization videos. 20% commission + free sample. Want to try it?`,
+ t2:`Hey {name}, just following up in case you missed this — free sample + 20% commission on our car registration holder. Happy to ship one this week!`,
+ t3:`Hi {name}, your sample is on the way! Video ideas: "POV: cop asks for registration", glovebox before/after, car essentials. Tag the product from the shop and let me know when it's live 🙌`};
+let S={creators:[],s:{...DT}};
+const $=id=>document.getElementById(id);
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)};
+const today=()=>new Date().toISOString().slice(0,10);
+const ds=d=>d?Math.floor((Date.now()-new Date(d).getTime())/864e5):0;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>n?Math.round(n).toLocaleString('en-US'):'—';
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j){S=j;S.s={...DT,...S.s}}}catch(e){}}
+function save(){localStorage.setItem(KEY,JSON.stringify(S));$('saved').textContent='saved '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}
+
+const last=c=>{let d='';ST.forEach(([k])=>{if(c[k]&&c[k]>d)d=c[k]});return d||c.added};
+function status(c){if(c.dead)return['Closed','p3'];if(c.vid)return['Video Posted','p2'];if(ST.some(([k])=>c[k]))return['In Progress','p1'];return['Not started','p0']}
+function action(c){const s=S.s,d=ds(last(c));
+ if(c.dead||c.vid)return{t:'—',p:0};
+ if(c.smp)return d>=s.dSmp?{t:'Video ka poochho',p:3}:{t:'—',p:0};
+ if(c.rep)return d>=s.dRep?{t:'Sample bhejo',p:4}:{t:'—',p:0};
+ if(c.msg)return d>=s.dMsg?{t:'Follow-up bhejo',p:3}:{t:'—',p:0};
+ if(c.inv)return d>=s.dInv?{t:'Message bhejo',p:2}:{t:'—',p:0};
+ return{t:'Invite bhejo',p:1}}
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));['today','creators','pipeline','settings'].forEach(t=>$('tab-'+t).classList.toggle('hide',t!==b.dataset.t));render()});
+
+// import
+$('file').addEventListener('change',async ev=>{let n=0;
+ for(const f of ev.target.files){const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
+  for(const sn of wb.SheetNames){if(/^all$/i.test(sn)&&wb.SheetNames.length>1)continue;
+   for(const r of XLSX.utils.sheet_to_json(wb.Sheets[sn],{defval:''})){const g=re=>{const k=Object.keys(r).find(k=>re.test(k));return k?r[k]:''};
+    let h=String(g(/handle|username|account/i)||'').trim().replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/,'').replace(/^@/,'').split(/[\/?]/)[0];
+    if(!h||S.creators.some(c=>c.handle.toLowerCase()===h.toLowerCase()))continue;
+    let b=String(g(/batch/i)||sn.replace(/batch\s*/i,'')||'').trim().toUpperCase();if(/^\d+$/.test(b))b='ABC'[+b-1]||b;
+    S.creators.push({id:Date.now()+Math.random(),handle:h,name:String(g(/^creator$|nickname|^name$/i)||h),followers:+String(g(/follower/i)).replace(/[^\d.]/g,'')||0,score:+g(/score/i)||0,batch:b,link:g(/link|url/i)||`https://www.tiktok.com/@${h}`,added:today(),inv:'',msg:'',rep:'',smp:'',vid:'',dead:false,note:''});n++}}}
+ ev.target.value='';save();render();toast(n+' creators add hue')});
+$('addOne').onclick=()=>{const h=(prompt('Handle (bina @)')||'').trim().replace(/^@/,'');if(!h)return;if(S.creators.some(c=>c.handle.toLowerCase()===h.toLowerCase()))return toast('Pehle se hai');S.creators.push({id:Date.now(),handle:h,name:h,followers:0,score:0,batch:'',link:`https://www.tiktok.com/@${h}`,added:today(),inv:'',msg:'',rep:'',smp:'',vid:'',dead:false,note:''});save();render()};
+
+function filtered(){const q=$('q').value.trim().toLowerCase(),st=$('fs').value,b=$('fb').value,so=$('so').value;
+ let v=S.creators.filter(c=>(!q||(c.name+' '+c.handle).toLowerCase().includes(q))&&(!st||status(c)[0]===st)&&(!b||c.batch===b));
+ const cmp={action:(a,b)=>action(b).p-action(a).p||ds(last(b))-ds(last(a)),days:(a,b)=>ds(last(b))-ds(last(a)),score:(a,b)=>b.score-a.score,followers:(a,b)=>b.followers-a.followers,added:(a,b)=>b.added.localeCompare(a.added)};
+ return v.sort(cmp[so])}
+['q','fs','fb','so'].forEach(id=>$(id).addEventListener('input',render));
+
+const HEAD=`<thead><tr><th>CREATOR</th><th>FOLLOWERS</th><th>SCORE</th><th class="c">INV</th><th class="c">MSG</th><th class="c">REP</th><th class="c">SMP</th><th class="c">VID</th><th>STATUS</th><th class="c">DAYS</th><th>ACTION</th><th>NOTE</th><th></th></tr></thead>`;
+function row(c){const [sl,sc]=status(c),a=action(c);
+ return`<tr style="${c.dead?'opacity:.5':''}"><td class="cr"><b>${esc(c.name)}</b><a href="${esc(c.link)}" target="_blank">@${esc(c.handle)}</a></td><td>${fmt(c.followers)}</td><td>${c.score||'—'}</td>`+
+ ST.map(([k])=>`<td class="c"><span class="tick ${c[k]?'on':''}" data-id="${c.id}" data-k="${k}" title="${c[k]||''}">${c[k]?'✓':''}</span></td>`).join('')+
+ `<td><span class="pill ${sc}">${sl}</span></td><td class="c">${ds(last(c))}</td><td><span class="act ${a.p?'':'n'}">${a.t}</span></td><td><input class="note" data-id="${c.id}" value="${esc(c.note)}" placeholder=""></td>
+ <td><div class="menu"><button>⋯</button><div><span data-m="${c.id}">Message copy</span><span data-b="${c.id}">Batch: ${c.batch||'—'}</span><span data-d="${c.id}">${c.dead?'Reopen':'Close'}</span><span data-x="${c.id}" style="color:#B91C1C">Delete</span></div></div></td></tr>`}
+function table(rows,w,empty){if(!rows.length){w.innerHTML=`<div class="empty">${empty}</div>`;return}w.innerHTML=`<table>${HEAD}<tbody>${rows.map(row).join('')}</tbody></table>`;bind(w)}
+function bind(w){const C=id=>S.creators.find(x=>x.id==id);
+ w.querySelectorAll('.tick').forEach(t=>t.onclick=()=>{const c=C(t.dataset.id),k=t.dataset.k;c[k]=c[k]?'':today();save();render()});
+ w.querySelectorAll('.note').forEach(n=>n.onchange=()=>{C(n.dataset.id).note=n.value;save()});
+ w.querySelectorAll('.menu>button').forEach(b=>b.onclick=e=>{e.stopPropagation();document.querySelectorAll('.menu.open').forEach(m=>m!==b.parentNode&&m.classList.remove('open'));b.parentNode.classList.toggle('open')});
+ w.querySelectorAll('[data-m]').forEach(b=>b.onclick=async()=>{const c=C(b.dataset.m);const t=c.smp?S.s.t3:c.msg?S.s.t2:S.s.t1;await navigator.clipboard.writeText(t.replace(/{name}/g,c.name.split(' ')[0]));toast('Message copied')});
+ w.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{const c=C(b.dataset.b);const v=prompt('Batch (A/B/C)',c.batch);if(v!==null){c.batch=v.trim().toUpperCase();save();render()}});
+ w.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const c=C(b.dataset.d);c.dead=!c.dead;save();render()});
+ w.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{if(confirm('Delete?')){S.creators=S.creators.filter(x=>x.id!=b.dataset.x);save();render()}})}
+document.addEventListener('click',()=>document.querySelectorAll('.menu.open').forEach(m=>m.classList.remove('open')));
+
+function render(){
+ const bs=[...new Set(S.creators.map(c=>c.batch).filter(Boolean))].sort();const fb=$('fb'),cur=fb.value;fb.innerHTML='<option value="">Sab</option>'+bs.map(b=>`<option ${b===cur?'selected':''}>${b}</option>`).join('');
+ const v=filtered();table(v,$('ctbl'),'Koi creator nahi. "+ Excel import" se Creator Scan ki file daalo.');
+ const due=S.creators.filter(c=>!c.dead&&action(c).p>0).sort((a,b)=>action(b).p-action(a).p||ds(last(b))-ds(last(a)));
+ $('tk').innerHTML=`<div class="kpi"><b style="color:var(--orange)">${due.length}</b><small>aaj action</small></div><div class="kpi"><b>${S.creators.filter(c=>!c.dead&&!c.vid&&action(c).p===0&&ST.some(([k])=>c[k])).length}</b><small>wait mein</small></div><div class="kpi"><b style="color:var(--green)">${S.creators.filter(c=>c.vid).length}</b><small>videos posted</small></div><div class="kpi"><b>${S.creators.length}</b><small>total</small></div>`;
+ table(due,$('ttbl'),'Aaj kuch pending nahi 🎉');
+ const n=S.creators.length,cnt=ST.map(([k])=>S.creators.filter(c=>c[k]).length),r=(a,b)=>b?Math.round(a/b*100)+'%':'—';
+ $('pk').innerHTML=`<div class="kpi"><b>${r(cnt[0],n)}</b><small>invited</small></div><div class="kpi"><b>${r(cnt[2],cnt[1])}</b><small>reply rate</small></div><div class="kpi"><b>${r(cnt[4],cnt[3])}</b><small>video rate (of samples)</small></div><div class="kpi"><b style="color:var(--green)">${cnt[4]}</b><small>videos live</small></div>`;
+ const vals=[n,...cnt],mx=Math.max(1,...vals);$('fun').innerHTML=vals.map(x=>`<div style="height:${x/mx*100}%"><span>${x}</span></div>`).join('');
+ $('bstats').innerHTML='<h3>Batch wise</h3><table><thead><tr><th>BATCH</th><th>CREATORS</th><th>INV</th><th>MSG</th><th>REP</th><th>SMP</th><th>VID</th></tr></thead><tbody>'+(bs.length?bs.map(b=>{const g=S.creators.filter(c=>c.batch===b);return`<tr><td><b>${b}</b></td><td>${g.length}</td>`+ST.map(([k])=>`<td>${g.filter(c=>c[k]).length}</td>`).join('')+'</tr>'}).join(''):'<tr><td colspan="7" style="color:var(--muted)">—</td></tr>')+'</tbody></table>';
+}
+$('bulkInv').onclick=()=>{const v=filtered();if(!v.length)return;if(!confirm(v.length+' creators ko Invited ✓ karein?'))return;v.forEach(c=>{if(!c.inv)c.inv=today()});save();render()};
+['dInv','dMsg','dRep','dSmp','t1','t2','t3'].forEach(id=>$(id).addEventListener('input',()=>{S.s[id]=id[0]==='d'?+$(id).value:$(id).value;save();render()}));
+$('bk').onclick=()=>{const a=document.createElement('a');a.href='data:application/json,'+encodeURIComponent(JSON.stringify(S));a.download=`outreach_backup_${today()}.json`;a.click()};
+$('rs').addEventListener('change',async ev=>{try{const j=JSON.parse(await ev.target.files[0].text());const ex=new Set(S.creators.map(c=>c.handle.toLowerCase()));j.creators.forEach(c=>{if(!ex.has(c.handle.toLowerCase()))S.creators.push(c)});save();render();toast('Restore ho gaya')}catch(e){toast('File galat hai')}ev.target.value=''});
+$('xl').onclick=()=>{const rows=S.creators.map(c=>({Creator:c.name,Handle:'@'+c.handle,Link:c.link,Followers:c.followers,Score:c.score,Batch:c.batch,Status:status(c)[0],Invited:c.inv,Messaged:c.msg,Replied:c.rep,'Sample sent':c.smp,'Video posted':c.vid,Days:ds(last(c)),Action:action(c).t,Note:c.note}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Outreach');XLSX.writeFile(wb,`outreach_${today()}.xlsx`)};
+$('wipe').onclick=()=>{if(confirm('Sab creators delete? Backup liya?')&&confirm('Pakka?')){S.creators=[];save();render()}};
+load();['dInv','dMsg','dRep','dSmp','t1','t2','t3'].forEach(id=>$(id).value=S.s[id]);render();
+</script>
+</body>
+</html>
